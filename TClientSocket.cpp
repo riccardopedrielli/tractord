@@ -13,11 +13,13 @@ void TClientSocket::onRead()
 	QStringList commands;
 	commands.append(readLine());
 
+	//da mettere nel costruttore
 	if(commands[0] == "u")
 	{
 		clientUid = thread->server->db->addUser(peerAddress());
 		write(QString("\r\nYour ip is: " + peerAddress().toString() + "\r\nYou uid is: " + clientUid + "\r\n").toAscii());
 	}
+	//
 	else if(commands[0] == "a")
 	{
 		thread->server->db->addFile(clientUid, "abc560", "Hyttulo.avi", "38976501943672", "1");
