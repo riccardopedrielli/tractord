@@ -10,7 +10,7 @@ class TClientSocket : public QTcpSocket
 
 private:
 	TThread *thread;
-	QString clientUid;
+	QString uid;
 
 public:
 	TClientSocket(QObject *parent);

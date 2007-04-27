@@ -10,23 +10,50 @@ TClientSocket::TClientSocket(QObject *parent) : QTcpSocket(parent)
 
 void TClientSocket::onRead()
 {
-	QStringList commands;
-	commands.append(readLine());
+	QString command = readLine();
 
-	//da mettere nel costruttore
-	if(commands[0] == "u")
+	/* Da mettere nel costruttore. */
+	if(command[0] == 'u')
 	{
-		clientUid = thread->server->db->addUser(peerAddress());
-		write(QString("\r\nYour ip is: " + peerAddress().toString() + "\r\nYou uid is: " + clientUid + "\r\n").toAscii());
+		if(uid.isEmpty())
+		{
+			uid = thread->server->db->addUser(peerAddress());
+			write(QString("\r\nYour ip is: " + peerAddress().toString() + "\r\nYou uid is: " + uid + "\r\n").toAscii());
+		}
+		else
+		{
+			write("\r\nYou already have a uid.\r\n");
+		}
 	}
-	//
-	else if(commands[0] == "a")
+	else if(command[0] == 'a')
 	{
-		thread->server->db->addFile(clientUid, "abc560", "Hyttulo.avi", "38976501943672", "1");
+		thread->server->db->addFile(uid, "abc560", "Hyttulo.avi", "38976501943672", "0");
+		write("\r\nFile added.\r\n");
 	}
-	else if(commands[0] == "d")
+	else if(command[0] == 'f')
 	{
-		thread->server->db->deleteFile("abc560", clientUid);
+		thread->server->db->addFile(uid, "a3d101", "t3x.jpg", "45679", "1");
+		write("\r\nFile added.\r\n");
+	}
+	else if(command[0] == 'd')
+	{
+		thread->server->db->deleteFile(uid, "abc560");
+		write("\r\nFile deleted.\r\n");
+	}
+	else if(command[0] == 'c')
+	{
+		thread->server->db->completeFile(uid, "abc560");
+		write("\r\nFile completed..\r\n");
+	}
+	else if(command[0] == 's')
+	{
+		thread->server->db->searchFile("%ttul%");
+		write("\r\nNot implemented yet.\r\n");
+	}
+	else if(command[0] == 'l')
+	{
+		thread->server->db->getSources(uid, "abc560");
+		write("\r\nNot implemented yet.\r\n");
 	}
 	else
 	{
@@ -36,6 +63,6 @@ void TClientSocket::onRead()
 
 void TClientSocket::onDisconnect()
 {
-	thread->server->db->deleteUser(clientUid);
+	thread->server->db->deleteUser(uid);
 	thread->quit();
 }
