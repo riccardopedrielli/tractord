@@ -198,10 +198,6 @@
 				RelativePath=".\TServer.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\TThread.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -226,10 +222,6 @@
 			</File>
 			<File
 				RelativePath=".\TServer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TThread.h"
 				>
 			</File>
 		</Filter>

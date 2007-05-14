@@ -2,18 +2,22 @@
 #define TCLIENTSOCKET_H
 
 #include <QtNetwork>
-#include "TThread.h"
+#include "TServer.h"
 
-class TClientSocket : public QTcpSocket
+class TClientSocket : public QThread
 {
 	Q_OBJECT
 
-private:
-	TThread *thread;
+private:	
+	QTcpSocket client;
 	QString uid;
 
+protected:
+    void run();
+
 public:
-	TClientSocket(QObject *parent);
+	TServer *server;
+	TClientSocket(QObject *parent, int socketId);
 
 private slots:
 	void onRead();

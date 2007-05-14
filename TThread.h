@@ -2,9 +2,10 @@
 #define TTHREAD_H
 
 #include <QtCore>
+#include <QtNetwork>
 #include "TServer.h"
 
-class TThread : public QThread
+class TClientSocket : public QThread
 {
 	Q_OBJECT
 
@@ -16,7 +17,7 @@ protected:
 
 public:
 	TServer *server;
-	TThread(QObject *parent, int socketId);
+	TClientSocket(QObject *parent, int socketId);
 };
 
 #endif //TTHREAD_H
