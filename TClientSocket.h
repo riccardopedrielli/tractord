@@ -9,7 +9,7 @@ class TClientSocket : public QThread
 	Q_OBJECT
 
 private:	
-	QTcpSocket client;
+	QTcpSocket socket;
 	QString uid;
 
 protected:
@@ -17,7 +17,7 @@ protected:
 
 public:
 	TServer *server;
-	TClientSocket(QObject *parent, int socketId);
+	TClientSocket(QObject *parent, int socketid);
 
 private slots:
 	void onRead();

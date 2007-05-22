@@ -8,8 +8,8 @@ TServer::TServer(QObject *parent) : QTcpServer(parent)
 	db = new TDatabase;
 }
 
-void TServer::incomingConnection(int socketId)
+void TServer::incomingConnection(int socketid)
 {	
-	TClientSocket *clientsocket = new TClientSocket(this, socketId);	
-	clientsocket->start();
+	TClientSocket *clientSocket = new TClientSocket(this, socketid);	
+	clientSocket->start();
 }

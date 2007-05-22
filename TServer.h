@@ -9,7 +9,7 @@ class TServer : public QTcpServer
 	Q_OBJECT
 
 private:
-	void incomingConnection(int socketId);
+	void incomingConnection(int socketid);
 
 public:
 	TServer(QObject *parent = 0);
