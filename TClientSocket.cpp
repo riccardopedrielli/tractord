@@ -1,5 +1,6 @@
 #include "TClientSocket.h"
 #include "TServer.h"
+#include "TParser.h"
 
 TClientSocket::TClientSocket(QObject *parent, int socketid)
 {
@@ -9,6 +10,7 @@ TClientSocket::TClientSocket(QObject *parent, int socketid)
 	
 	connect(&socket, SIGNAL(readyRead()), this, SLOT(onRead()));
 	connect(&socket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
+	uid = server->db->addUser(socket.peerAddress());
 }
 
 void TClientSocket::run()
@@ -17,10 +19,23 @@ void TClientSocket::run()
 }
 
 void TClientSocket::onRead()
-{
-	QString command = socket.readLine();
+{	
+	QStringList cmdlist = TParser::splitCommands(socket.readLine());	
 
-	/* Da mettere nel costruttore. */
+	for(int i=0; i<cmdlist.count(); i++)
+	{
+		QString cmdname = TParser::getCommand(cmdlist[i]);
+				
+		if (cmdname == "ADDFILE")
+		{
+			QString name,dim,hash,complete;			
+			TParser::splitAddFile(cmdlist[i], name, dim, hash, complete);
+			server->db->addFile(uid, hash, name, dim, complete);
+			break;
+		}
+	}
+
+	/* Da mettere nel costruttore. 
 	if(command[0] == 'u')
 	{
 		if(uid.isEmpty())
@@ -66,7 +81,7 @@ void TClientSocket::onRead()
 	else
 	{
 		socket.write("\r\nInvalid command.\r\n");
-	}
+	}*/
 }
 
 void TClientSocket::onDisconnect()
