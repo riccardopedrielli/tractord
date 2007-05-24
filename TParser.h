@@ -16,8 +16,8 @@ public:
 	static QString getFile(QString hash,QString byte);
 	static void splitAddFile(QString file, QString &name,QString &dim,QString &hash,QString &complete);
 	static void splitSendFile(QString file, QString &name,QString &dim,QString &hash,QString &complete,QString &sources);
-	static void splitFind(QString file, QString &name);
-	static void splitGetIp(QString file, QString &hash);
+	static QString splitFind(QString file);
+	static QString splitGetIp(QString file);
 	static void splitSendIp(QString file, QString &hash,QString &ip,QString &port);
 	static void spiltGetFile(QString file,QString &hash,QString &byte); 
 	static QString getCommand(QString command);

@@ -6,8 +6,7 @@ TClientSocket::TClientSocket(QObject *parent, int socketid)
 {
 	server = (TServer*)parent;	
 	socket.setSocketDescriptor(socketid);
-	connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-	
+	connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));	
 	connect(&socket, SIGNAL(readyRead()), this, SLOT(onRead()));
 	connect(&socket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
 	uid = server->db->addUser(socket.peerAddress());
@@ -30,9 +29,10 @@ void TClientSocket::onRead()
 		{
 			QString name,dim,hash,complete;			
 			TParser::splitAddFile(cmdlist[i], name, dim, hash, complete);
-			server->db->addFile(uid, hash, name, dim, complete);
-			break;
+			server->db->addFile(uid, hash, name, dim, complete);			
 		}
+		if (cmdname == "FIND")
+			server->db->searchFile(TParser::splitFind(cmdlist[i]));
 	}
 
 	/* Da mettere nel costruttore. 

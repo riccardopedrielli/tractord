@@ -90,22 +90,26 @@ void TParser::splitSendFile (QString file, QString &name,QString &dim,QString &h
 }
 
 //Funzione splitFind 
-void TParser::splitFind (QString file, QString &name)
+QString TParser::splitFind(QString file)
 {
 	QStringList temp;
+	QString name;
 	temp=file.split(" \"");
 	name=temp[1];
 	name.replace("/\"/","\"");
 	name.chop(2);
+	return name;
 }
 
 //Funzione splitGetIp 
-void TParser::splitGetIp (QString file, QString &hash)
+QString TParser::splitGetIp(QString file)
 {
 	QStringList temp;
+	QString hash;
 	temp=file.split(" \"");
 	hash=temp[1];
 	hash.chop(2);
+	return hash;
 }
 
 //Funzione splitSendIp
