@@ -1,146 +1,240 @@
-#include <QtCore>
-#include <QString>
-#include <TParser.h>
-#include <QList>
-#include <QStringList>
+#include "TParser.h"
 
-//Funzione addFile (Client)
-QString TParser::addFile(QString name, quint64 dim, QString hash, quint64 complete)
+/*** BEGIN COMMON METHODS ***/
+
+/* Split the commands whenever they arrive concatenated. */
+QStringList TParser::splitCommands(QString commands)
 {
-	QString str;
-	name.replace(QString("\""), QString("/\"/"));	//Controllo Per Le "" dove ci sono sostitusce /"/
-	str = "ADDFILE \""+name+"\" \""+QString::number(dim, 10)+"\" \""+hash+"\" \""+QString::number(complete, 10)+"\";";	//Crea la Stringa
-	return str;
-}
-//Funzione find	(Client)
-QString TParser::find(QString file)
-{
-	QString str;
-	file.replace(QString("\""), QString("/\"/"));	//Controllo Per Le "" dove ci sono sostitusce /"/
-	str="FIND \""+file+"\";";	//Crea la Stringa
-	return str;
-}
-//Funzioni Send	(Server)
-QString TParser::sendFile(QString name, QString dim, QString hash, QString complete,QString sources)
-{
-	name.replace(QString("\""), QString("/\"/"));	//Controllo Per Le "" dove ci sono sostitusce /"/ 	
- 	return "FILE \""+name+"\" \""+dim+"\" \""+hash+"\" \""+complete+"\" \""+sources+"\";";
+	QStringList list;
+	list=commands.split("\";", QString::SkipEmptyParts);
+	for(int i=0; i<list.count(); i++)
+		list[i].append("\"");
+	return list;
 }
 
-//Funzione GETIP	(Client)
-QString TParser::getIp(QString hash)
-{	
-	return "GETIP \""+hash+"\";";
-}
-
-//Funzione sendIp	(Server)
-QString TParser::sendIp(QString hash,QString ip,QString port)
-{	
-	return "IP \""+hash+"\" \""+ip+"\" \""+port+"\";";
-}
-
-//Funzione getFile (Client)
-QString TParser::getFile(QString hash,QString byte)
-{
-	return "GETFILE \""+hash+"\" \""+byte+"\";";
-}
-
-//Funzione splitCommands 
-QStringList TParser::splitCommands(QString file)
-{
-	QStringList lista;
-	lista=file.split("\";", QString::SkipEmptyParts);
-	for(int i=0;i<lista.count();i++)
-		lista[i].append("\"");
-	return lista;
-}
-
-//Funzione slpitAddFile 
-void TParser::splitAddFile (QString file, QString &name,QString &dim,QString &hash,QString &complete)
-{
-	QStringList temp;
-	temp=file.split(" \"");
-	name=temp[1];
-	name.replace("/\"/","\"");
-	name.chop(1);
-	dim=temp[2];
-	dim.chop(1);
-	hash=temp[3];
-	hash.chop(1);
-	complete=temp[4];	
-	complete.chop(2);
-}
-
-//Funzione splitSendFile 
-void TParser::splitSendFile (QString file, QString &name,QString &dim,QString &hash,QString &complete,QString &sources)
-{
-	QStringList temp;
-	temp=file.split(" \"");
-	name=temp[1];
-	name.replace("/\"/","\"");
-	name.chop(1);
-	dim=temp[2];
-	dim.chop(1);
-	hash=temp[3];
-	hash.chop(1);
-	complete=temp[4];	
-	complete.chop(1);
-	sources=temp[5];
-	sources.chop(2);
-}
-
-//Funzione splitFind 
-QString TParser::splitFind(QString file)
-{
-	QStringList temp;
-	QString name;
-	temp=file.split(" \"");
-	name=temp[1];
-	name.replace("/\"/","\"");
-	name.chop(2);
-	return name;
-}
-
-//Funzione splitGetIp 
-QString TParser::splitGetIp(QString file)
-{
-	QStringList temp;
-	QString hash;
-	temp=file.split(" \"");
-	hash=temp[1];
-	hash.chop(2);
-	return hash;
-}
-
-//Funzione splitSendIp
-void TParser::splitSendIp(QString file, QString &hash,QString &ip,QString &port)
-{
-	QStringList temp;
-	temp=file.split(" \"");
-	hash=temp[1];
-	hash.chop(1);
-	ip=temp[2];
-	ip.chop(1);
-	port=temp[3];
-	port.chop(2);
-}
-
-//Funzione spiltGetFile
-void TParser::spiltGetFile(QString file,QString &hash,QString &byte)
-{
-	QStringList temp;
-	temp=file.split(" \"");
-	hash=temp[1];
-	hash.chop(1);
-	byte=temp[2];
-	byte.chop(2);
-}
-
-//Funzione getCommand
+/* Read the command keyword by extracting the first word from the string. */
 QString TParser::getCommand(QString command)
 {
-	QString str;
-	for(int i=0;command.at(i)!=' ';i++)
-		str+=command.at(i);
-	return str;
+	QString keyword;
+	for(int i=0; command.at(i)!=' '; i++)
+		keyword+=command.at(i);
+	return keyword;
 }
+
+/*** END COMMON METHODS ***/
+
+
+/*** BEGIN SERVER METHODS ***/
+
+/* Split the arguments of the ADDFILE command received from the client. */
+bool TParser::splitAddFile(QString command, QString &fid, QString &name, QString &dim, QString &complete)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=5)
+		return false;
+	fid=list[1];
+	fid.chop(1);
+	name=list[2];
+	name.replace("/\"/","\"");
+	name.chop(1);
+	dim=list[3];
+	dim.chop(1);
+	complete=list[4];	
+	complete.chop(2);
+	return true;
+}
+
+/* Split the arguments of the DELFILE command received from the client. */
+bool TParser::splitDelFile(QString command, QString &fid)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=2)
+		return false;
+	fid=list[1];
+	fid.chop(2);
+	return true;
+}
+
+/* Split the arguments of the COMPLETE command received from the client. */
+bool TParser::splitComplete(QString command, QString &fid)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=2)
+		return false;
+	fid=list[1];
+	fid.chop(2);
+	return true;
+}
+
+/* Split the arguments of the PORT command received from the client. */
+bool TParser::splitPort(QString command, QString &port)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=2)
+		return false;
+	port=list[1];
+	port.chop(2);
+	return true;
+}
+
+/* Compose the MSG command for sending it to the client. */
+QString TParser::sendMsg(QString message)
+{
+	return "MSG \"" + message + "\";";
+}
+
+/* Split the arguments of the FIND command received from the client. */
+bool TParser::splitFind(QString command, QString &name)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=2)
+		return false;
+	name=list[1];
+	name.replace("/\"/","\""); //Reaplace /"/ with "
+	name.chop(2);
+	return true;
+}
+
+/* Compose the FILE command for sending it to the client. */
+QString TParser::sendFile(QString fid, QString name, QString dim, QString sources, QString completes)
+{
+	name.replace(QString("\""), QString("/\"/")); //Reaplace " with /"/
+ 	return "FILE \"" + fid + "\" \"" + name + "\" \"" + dim + "\" \"" + sources + "\" \"" + completes + "\";";
+}
+
+/* Split the arguments of the GETIP command received from the client. */
+bool TParser::splitGetIp(QString command, QString &fid)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=2)
+		return false;
+	fid=list[1];
+	fid.chop(2);
+	return true;
+}
+
+/* Compose the IP command for sending it to the client. */
+QString TParser::sendIp(QString fid, QString ip, QString port)
+{	
+	return "IP \"" + fid + "\" \"" + ip + "\" \"" + port + "\";";
+}
+
+/*** END SERVER METHODS ***/
+
+
+/*** BEGIN CLIENT METHODS ***/
+
+/* Compose the ADDFILE command for sending it to the server. */
+QString TParser::addFile(QString fid, QString name, quint64 dim, int complete)
+{
+	name.replace(QString("\""), QString("/\"/")); //Reaplace " with /"/
+	return "ADDFILE \"" + fid + "\" \"" + name + "\" \"" + QString::number(dim) + "\" \"" + QString::number(complete) + "\";";
+}
+
+/* Compose the DELFILE command for sending it to the server. */
+QString TParser::delFile(QString fid)
+{
+	return "DELFILE \"" + fid + "\";";
+}
+
+/* Compose the COMPLETE command for sending it to the server. */
+QString TParser::complete(QString fid)
+{
+	return "COMPLETE \"" + fid + "\";";
+}
+
+/* Compose the PORT command for sending it to the server. */
+QString TParser::port(int port)
+{
+	return "PORT \"" + QString::number(port) + "\";";
+}
+
+/* Split the arguments of the MSG command received from the server. */
+bool TParser::splitSendMsg(QString command, QString message)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=2)
+		return false;
+	message=list[1];
+	message.chop(2);
+	return true;
+}
+
+/* Compose the FIND command for sending it to the server. */
+QString TParser::find(QString name)
+{
+	name.replace(QString("\""), QString("/\"/")); //Reaplace " with /"/
+	return "FIND \"" + name + "\";";
+}
+
+/* Split the arguments of the FILE command received from the server. */
+bool TParser::splitSendFile(QString command, QString &fid, QString &name, QString &dim, QString &sources, QString &completes)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=6)
+		return false;
+	fid=list[1];
+	fid.chop(1);
+	name=list[2];
+	name.replace("/\"/","\""); //Reaplace /"/ with "
+	name.chop(1);
+	dim=list[3];
+	dim.chop(1);
+	sources=list[4];
+	sources.chop(2);
+	completes=list[5];	
+	completes.chop(1);
+	return true;
+}
+
+/* Compose the GETIP command for sending it to the server. */
+QString TParser::getIp(QString fid)
+{	
+	return "GETIP \"" + fid + "\";";
+}
+
+/* Split the arguments of the IP command received from the server. */
+bool TParser::splitSendIp(QString command, QString &fid, QString &ip, QString &port)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=4)
+		return false;
+	fid=list[1];
+	fid.chop(1);
+	ip=list[2];
+	ip.chop(1);
+	port=list[3];
+	port.chop(2);
+	return true;
+}
+
+/* Compose the GETFILE command for sending it to another client. */
+QString TParser::getFile(QString fid, QString byte)
+{
+	return "GETFILE \"" + fid + "\" \"" + byte + "\";";
+}
+
+/* Split the arguments of the GETFILE command received from another client. */
+bool TParser::splitGetFile(QString command, QString &fid, QString &byte)
+{
+	QStringList list;
+	list=command.split(" \"");
+	if(list.count()!=3)
+		return false;
+	fid=list[1];
+	fid.chop(1);
+	byte=list[2];
+	byte.chop(2);
+	return true;
+}
+
+/*** END CLIENT METHODS ***/

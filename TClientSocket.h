@@ -11,12 +11,12 @@ class TClientSocket : public QThread
 private:	
 	QTcpSocket socket;
 	QString uid;
+	TServer *server;
 
 protected:
     void run();
 
 public:
-	TServer *server;
 	TClientSocket(QObject *parent, int socketid);
 
 private slots:

@@ -1,24 +1,33 @@
-#include <QString>
-#include <QList>
-#include <QStringList>
-
+#include <QtCore>
 
 class TParser
-{	
+{
 public:
-	//FUNZIONI
-	static QString addFile(QString name, quint64 dim, QString hash, quint64 complete); 
-	static QString sendFile(QString name, QString dim, QString hash, QString complete,QString sources); 
-	static QString find(QString file);	
-	static QString getIp(QString hash);	//Restituisce hash
-	static QString sendIp(QString hash,QString ip,QString port);	//Restituisce hash+ip
-	static QStringList splitCommands(QString File);
-	static QString getFile(QString hash,QString byte);
-	static void splitAddFile(QString file, QString &name,QString &dim,QString &hash,QString &complete);
-	static void splitSendFile(QString file, QString &name,QString &dim,QString &hash,QString &complete,QString &sources);
-	static QString splitFind(QString file);
-	static QString splitGetIp(QString file);
-	static void splitSendIp(QString file, QString &hash,QString &ip,QString &port);
-	static void spiltGetFile(QString file,QString &hash,QString &byte); 
+	/* Common methods */
+	static QStringList splitCommands(QString commands);
 	static QString getCommand(QString command);
+
+	/* Server methods */
+	static bool splitAddFile(QString command, QString &fid, QString &name, QString &dim, QString &complete);
+	static bool splitDelFile(QString command, QString &fid);
+	static bool splitComplete(QString command, QString &fid);
+	static bool splitPort(QString command, QString &port);
+	static QString sendMsg(QString message);
+	static bool splitFind(QString command, QString &name);
+	static QString sendFile(QString fid, QString name, QString dim, QString sources, QString completes);
+	static bool splitGetIp(QString command, QString &fid);
+	static QString sendIp(QString fid, QString ip, QString port);
+
+	/* Client methods */
+	static QString addFile(QString fid, QString name, quint64 dim, int complete);
+	QString delFile(QString fid);
+	QString complete(QString fid);
+	QString port(int port);
+	static bool splitSendMsg(QString command, QString message);
+	static QString find(QString name);
+	static bool splitSendFile(QString command, QString &fid, QString &name, QString &dim, QString &sources, QString &completes);
+	static QString getIp(QString fid);
+	static bool splitSendIp(QString command, QString &fid, QString &ip, QString &port);
+	static QString getFile(QString fid, QString byte);
+	static bool splitGetFile(QString command, QString &fid, QString &byte);
 };
