@@ -41,7 +41,7 @@ bool TParser::splitAddFile(QString command, QString &fid, QString &name, QString
 	dim=list[3];
 	dim.chop(1);
 	complete=list[4];	
-	complete.chop(2);
+	complete.chop(1);
 	return true;
 }
 
@@ -53,7 +53,7 @@ bool TParser::splitDelFile(QString command, QString &fid)
 	if(list.count()!=2)
 		return false;
 	fid=list[1];
-	fid.chop(2);
+	fid.chop(1);
 	return true;
 }
 
@@ -65,7 +65,7 @@ bool TParser::splitComplete(QString command, QString &fid)
 	if(list.count()!=2)
 		return false;
 	fid=list[1];
-	fid.chop(2);
+	fid.chop(1);
 	return true;
 }
 
@@ -77,7 +77,7 @@ bool TParser::splitPort(QString command, QString &port)
 	if(list.count()!=2)
 		return false;
 	port=list[1];
-	port.chop(2);
+	port.chop(1);
 	return true;
 }
 
@@ -96,15 +96,15 @@ bool TParser::splitFind(QString command, QString &name)
 		return false;
 	name=list[1];
 	name.replace("/\"/","\""); //Reaplace /"/ with "
-	name.chop(2);
+	name.chop(1);
 	return true;
 }
 
 /* Compose the FILE command for sending it to the client. */
-QString TParser::sendFile(QString fid, QString name, QString dim, QString sources, QString completes)
+QString TParser::sendFile(QString fid, QString name, QString dim, QString sources, QString completes, QString sid)
 {
 	name.replace(QString("\""), QString("/\"/")); //Reaplace " with /"/
- 	return "FILE \"" + fid + "\" \"" + name + "\" \"" + dim + "\" \"" + sources + "\" \"" + completes + "\";";
+ 	return "FILE \"" + fid + "\" \"" + name + "\" \"" + dim + "\" \"" + sources + "\" \"" + completes + "\" \"" + sid + "\";";
 }
 
 /* Split the arguments of the GETIP command received from the client. */
@@ -115,7 +115,7 @@ bool TParser::splitGetIp(QString command, QString &fid)
 	if(list.count()!=2)
 		return false;
 	fid=list[1];
-	fid.chop(2);
+	fid.chop(1);
 	return true;
 }
 
@@ -150,7 +150,7 @@ QString TParser::complete(QString fid)
 }
 
 /* Compose the PORT command for sending it to the server. */
-QString TParser::port(int port)
+QString TParser::port(quint16 port)
 {
 	return "PORT \"" + QString::number(port) + "\";";
 }
@@ -163,23 +163,23 @@ bool TParser::splitSendMsg(QString command, QString message)
 	if(list.count()!=2)
 		return false;
 	message=list[1];
-	message.chop(2);
+	message.chop(1);
 	return true;
 }
 
 /* Compose the FIND command for sending it to the server. */
-QString TParser::find(QString name)
+QString TParser::find(QString name, quint64 sid)
 {
 	name.replace(QString("\""), QString("/\"/")); //Reaplace " with /"/
-	return "FIND \"" + name + "\";";
+	return "FIND \"" + name + "\" \"" + QString::number(sid) + "\";";
 }
 
 /* Split the arguments of the FILE command received from the server. */
-bool TParser::splitSendFile(QString command, QString &fid, QString &name, QString &dim, QString &sources, QString &completes)
+bool TParser::splitSendFile(QString command, QString &fid, QString &name, QString &dim, QString &sources, QString &completes, QString &sid)
 {
 	QStringList list;
 	list=command.split(" \"");
-	if(list.count()!=6)
+	if(list.count()!=7)
 		return false;
 	fid=list[1];
 	fid.chop(1);
@@ -189,9 +189,11 @@ bool TParser::splitSendFile(QString command, QString &fid, QString &name, QStrin
 	dim=list[3];
 	dim.chop(1);
 	sources=list[4];
-	sources.chop(2);
+	sources.chop(1);
 	completes=list[5];	
 	completes.chop(1);
+	sid=list[6];
+	sid.chop(1);
 	return true;
 }
 
@@ -213,14 +215,14 @@ bool TParser::splitSendIp(QString command, QString &fid, QString &ip, QString &p
 	ip=list[2];
 	ip.chop(1);
 	port=list[3];
-	port.chop(2);
+	port.chop(1);
 	return true;
 }
 
 /* Compose the GETFILE command for sending it to another client. */
-QString TParser::getFile(QString fid, QString byte)
+QString TParser::getFile(QString fid, quint64 byte)
 {
-	return "GETFILE \"" + fid + "\" \"" + byte + "\";";
+	return "GETFILE \"" + fid + "\" \"" + QString::number(byte) + "\";";
 }
 
 /* Split the arguments of the GETFILE command received from another client. */
@@ -233,7 +235,7 @@ bool TParser::splitGetFile(QString command, QString &fid, QString &byte)
 	fid=list[1];
 	fid.chop(1);
 	byte=list[2];
-	byte.chop(2);
+	byte.chop(1);
 	return true;
 }
 

@@ -16,8 +16,9 @@ public:
 	QString addUser(QHostAddress ip);
 	void deleteUser(QString uid);
 	void addFile(QString uid, QString fid, QString name, QString dim, QString complete);
-	void deleteFile(QString fid, QString uid);
+	void deleteFile(QString uid, QString fid);
 	void completeFile(QString uid, QString fid);
+	void setPort(QString uid, QString port);
 	QStringList searchFile(QString name);
 	QStringList getSources(QString uid, QString fid); 
 };
