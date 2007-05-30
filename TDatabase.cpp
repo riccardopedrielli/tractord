@@ -128,7 +128,11 @@ QStringList TDatabase::searchFile(QString name)
 {
 	/* Ottengo tutte le informazioni relative ai files corrispondenti alla stringa cercata. */
 	QSqlQuery getList("SELECT names.name, names.fid, files.dim, sources.complete FROM names, files, sources WHERE name LIKE '" + name + "' AND names.fid=files.fid AND names.fid=sources.fid");
-	QStringList list; //TODO: fill the list with query result.
+	QStringList list;
+	/*while(getList.next())
+	{
+		
+	}*/
 	return list;
 }
 

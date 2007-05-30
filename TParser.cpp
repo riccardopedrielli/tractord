@@ -36,7 +36,7 @@ bool TParser::splitAddFile(QString command, QString &fid, QString &name, QString
 	fid=list[1];
 	fid.chop(1);
 	name=list[2];
-	name.replace("/\"/","\"");
+	name.replace("/\"/","\""); //Reaplace /"/ with "
 	name.chop(1);
 	dim=list[3];
 	dim.chop(1);
@@ -84,19 +84,25 @@ bool TParser::splitPort(QString command, QString &port)
 /* Compose the MSG command for sending it to the client. */
 QString TParser::sendMsg(QString message)
 {
+	message.replace(QString("\""), QString("/\"/")); //Reaplace " with /"/
 	return "MSG \"" + message + "\";";
 }
 
 /* Split the arguments of the FIND command received from the client. */
-bool TParser::splitFind(QString command, QString &name)
+bool TParser::splitFind(QString command, QString &name, QString &sid)
 {
 	QStringList list;
 	list=command.split(" \"");
-	if(list.count()!=2)
+	if(list.count()!=3)
 		return false;
 	name=list[1];
 	name.replace("/\"/","\""); //Reaplace /"/ with "
 	name.chop(1);
+	name.replace(" ","\%");
+	name.prepend("\%");
+	name.append("\%");
+	sid=list[2];
+	sid.chop(1);
 	return true;
 }
 
@@ -163,6 +169,7 @@ bool TParser::splitSendMsg(QString command, QString message)
 	if(list.count()!=2)
 		return false;
 	message=list[1];
+	message.replace("/\"/","\""); //Reaplace /"/ with "
 	message.chop(1);
 	return true;
 }

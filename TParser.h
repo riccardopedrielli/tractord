@@ -13,7 +13,7 @@ public:
 	static bool splitComplete(QString command, QString &fid);
 	static bool splitPort(QString command, QString &port);
 	static QString sendMsg(QString message);
-	static bool splitFind(QString command, QString &name);
+	static bool splitFind(QString command, QString &name, QString &sid);
 	static QString sendFile(QString fid, QString name, QString dim, QString sources, QString completes, QString sid);
 	static bool splitGetIp(QString command, QString &fid);
 	static QString sendIp(QString fid, QString ip, QString port);

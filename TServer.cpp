@@ -1,6 +1,5 @@
 #include "TServer.h"
 #include "TClientSocket.h"
-#include <QFile>
 
 TServer::TServer(QObject *parent) : QTcpServer(parent)
 {
