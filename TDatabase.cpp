@@ -65,10 +65,10 @@ void TDatabase::deleteUser(QString uid)
 	/* Delete the user. */
 	QSqlQuery deleteUid("DELETE FROM users WHERE uid='" + uid + "'");
 
-	/* Ottengo l'elenco dei files appartenenti all'utente. */
+	/* Get the list of files that belong to the user. */
 	QSqlQuery getFiles("SELECT fid FROM sources WHERE uid='" + uid + "'");
 
-	/* Elimino i files. */
+	/* Delete the files. */
 	while(getFiles.next())
 	{
 		deleteFile(uid, getFiles.value(0).toString());
@@ -77,69 +77,75 @@ void TDatabase::deleteUser(QString uid)
 
 void TDatabase::addFile(QString uid, QString fid, QString name, QString dim, QString complete)
 {
-	/* Controllo se il file esiste. */
+	/* Che the file existance. */
 	QSqlQuery checkFile("SELECT COUNT(*) FROM files WHERE fid='" + fid + "'");
 	if(checkFile.value(0).toInt() == 0)
 	{
-		/* Se non esiste lo aggiungo. */
+		/* If not exist is added. */
 		QSqlQuery addFid("INSERT INTO files VALUES ('" + fid + "', '" + dim + "')");
 	}
 
-	/* Controllo se il nome del file esiste. */
-	QSqlQuery checkName("SELECT COUNT(*) FROM names WHERE fid='" + fid + "' AND name='" + name + "'");
-	if(checkName.value(0).toInt() == 0)
+	/* Check the name existance. */
+	/* ATTENTION: This is a workaround because the original query didn't work. */
+	QSqlQuery checkName("SELECT * FROM names WHERE fid='" + fid + "' AND name='" + name + "' LIMIT 0, 1");
+	if(checkName.size() == 0)
 	{
-		/* Se non esiste lo aggiungo. */
+		/* If not exist is added. */
 		QSqlQuery addName("INSERT INTO names VALUES ('" + fid + "', '" + name + "')");
 	}
 
-	/* Aggiungo la fonte del file. */
+	/* Add the source. */
 	QSqlQuery addSource("INSERT INTO sources VALUES ('" + uid + "', '" + fid + "', '" + complete + "')");
 }
 
 void TDatabase::deleteFile(QString uid, QString fid)
 {
-	/* Elimino la fonte. */
+	/* Delete the source. */
 	QSqlQuery deleteSource("DELETE FROM sources WHERE uid='" + uid + "' AND fid='" + fid + "'");
 
-	/* Verifico che ci siano altre fonti. */
-	QSqlQuery checkSources("SELECT COUNT(*) FROM sources WHERE fid='" + fid + "'");
-	if(checkSources.value(0).toInt() == 0)
-	{
-		/* Se non ci sono altre fonti elimino il file e tutti i suoi nomi. */
-		QSqlQuery deleteFid("DELETE FROM files WHERE fid='" + fid +"'");
-		QSqlQuery deleteName("DELETE FROM names WHERE fid='" + fid +"'");
-	}
+	/* Check the existance of other sources. */
+	/* If there are no more sources, the file and all its names are deleted. */
+	QSqlQuery deleteFile("DELETE FROM files WHERE fid='" + fid +"' AND (SELECT COUNT(*) AS n FROM sources WHERE fid='" + fid +"')=0");
+	QSqlQuery deleteName("DELETE FROM names WHERE fid='" + fid +"' AND (SELECT COUNT(*) AS n FROM sources WHERE fid='" + fid +"')=0");
 }
 
 void TDatabase::completeFile(QString uid, QString fid)
 {
-	/* Imposto a 1 (true) la propriet… 'complete' della fonte. */
+	/* Set to 1 (true) the 'complete' property of the source. */
 	QSqlQuery setComplete("UPDATE sources SET complete=1 WHERE uid='" + uid + "' AND fid='" + fid + "'");
 }
 
 void TDatabase::setPort(QString uid, QString port)
 {
-	/* Setto la porta del client. */
+	/* Set the client port. */
 	QSqlQuery setPort("UPDATE users SET port='" + port + "' WHERE uid='" + uid + "'");
 }
 
 QStringList TDatabase::searchFile(QString name)
 {
-	/* Ottengo tutte le informazioni relative ai files corrispondenti alla stringa cercata. */
-	QSqlQuery getList("SELECT names.name, names.fid, files.dim, sources.complete FROM names, files, sources WHERE name LIKE '" + name + "' AND names.fid=files.fid AND names.fid=sources.fid");
+	/* Get the informations of files that correspond the searched string. */
+	QSqlQuery getList("SELECT names.fid AS fileid, names.name, files.dim, (SELECT count(*) FROM sources WHERE fid=fileid) AS sources, (SELECT count(*) FROM sources WHERE fid=fileid AND complete=1) AS completes FROM names, files WHERE names.name LIKE '" + name + "' AND names.fid = files.fid");
 	QStringList list;
-	/*while(getList.next())
+	while(getList.next())
 	{
-		
-	}*/
+		list.append(getList.value(1).toString()); //Name
+		list.append(getList.value(2).toString()); //Dim
+		list.append(getList.value(3).toString()); //Sources
+		list.append(getList.value(4).toString()); //Completes
+		list.append(getList.value(0).toString()); //Fid
+	}
 	return list;
 }
 
 QStringList TDatabase::getSources(QString uid, QString fid)
 {
-	/* Ottengo la lista delle fonti del file. */
-	QSqlQuery getList("SELECT ip, port FROM users, sources WHERE fid='" + fid + "' AND sources.uid<>'" + uid + "'");
+	/* Get the file sources list. */
+	QSqlQuery getList("SELECT users.ip, users.port FROM users, sources WHERE sources.fid='" + fid + "' AND sources.uid=users.uid AND sources.uid<>'" + uid + "'");
 	QStringList list; //TODO: fill the list with query result.
+	while(getList.next())
+	{
+		list.append(getList.value(0).toString()); //Ip
+		list.append(getList.value(1).toString()); //Port
+	}
 	return list;
 }

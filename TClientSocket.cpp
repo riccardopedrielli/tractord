@@ -109,6 +109,10 @@ void TClientSocket::onRead()
 				files = server->db->searchFile(name);
 				QDateTime endTime(QDateTime::currentDateTime());
 				socket.write(QString("[" + endTime.toString("hh:mm:ss.zzz") + "] FIND executed successfully.").toAscii());
+				for(int i=0; i<files.count(); i+=5)
+				{
+					socket.write(QString("SID: " + sid + " | name: " + files.at(i) + " | dim: " + files.at(i+1) + " | sources: " + files.at(i+2) + " | completes: " + files.at(i+3) + " | fid: " + files.at(i+4)).toAscii());
+				}
 			}
 			else
 			{
@@ -127,6 +131,10 @@ void TClientSocket::onRead()
 				sources = server->db->getSources(uid, fid);
 				QDateTime endTime(QDateTime::currentDateTime());
 				socket.write(QString("[" + endTime.toString("hh:mm:ss.zzz") + "] GETIP executed successfully.").toAscii());
+				for(int i=0; i<sources.count(); i+=2)
+				{
+					socket.write(QString("FID: " + fid + " | ip: " + sources.at(i) + " | port: " + sources.at(i+1)).toAscii());
+				}
 			}
 			else
 			{
