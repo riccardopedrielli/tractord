@@ -1,6 +1,7 @@
 #include "TClientSocket.h"
 #include "TServer.h"
 #include "TParser.h"
+#include "info_structs.h"
 #include <QDateTime>
 
 TClientSocket::TClientSocket(QObject *parent, int socketid)
@@ -100,7 +101,7 @@ void TClientSocket::onRead()
 		}
 		else if(cmdname == "FIND")
 		{
-			QStringList files;
+			QList<FileInfo> files;
 			QString name, sid;
 			if(TParser::splitFind(cmdlist[i], name, sid))
 			{
@@ -109,9 +110,9 @@ void TClientSocket::onRead()
 				files = server->db->searchFile(name);
 				QDateTime endTime(QDateTime::currentDateTime());
 				socket.write(QString("[" + endTime.toString("hh:mm:ss.zzz") + "] FIND executed successfully.").toAscii());
-				for(int i=0; i<files.count(); i+=5)
+				for(int p=0; p<files.count(); p++)
 				{
-					socket.write(QString("SID: " + sid + " | name: " + files.at(i) + " | dim: " + files.at(i+1) + " | sources: " + files.at(i+2) + " | completes: " + files.at(i+3) + " | fid: " + files.at(i+4)).toAscii());
+					socket.write(TParser::sendFile(sid, files.at(p).name, files.at(p).dim, files.at(p).sources, files.at(p).completes, files.at(p).fid).toAscii());
 				}
 			}
 			else
@@ -122,7 +123,7 @@ void TClientSocket::onRead()
 		}
 		else if(cmdname == "GETIP")
 		{
-			QStringList sources;
+			QList<FileSource> sources;
 			QString fid;
 			if(TParser::splitGetIp(cmdlist[i], fid))
 			{
@@ -131,9 +132,9 @@ void TClientSocket::onRead()
 				sources = server->db->getSources(uid, fid);
 				QDateTime endTime(QDateTime::currentDateTime());
 				socket.write(QString("[" + endTime.toString("hh:mm:ss.zzz") + "] GETIP executed successfully.").toAscii());
-				for(int i=0; i<sources.count(); i+=2)
+				for(int p=0; p<sources.count(); p++)
 				{
-					socket.write(QString("FID: " + fid + " | ip: " + sources.at(i) + " | port: " + sources.at(i+1)).toAscii());
+					socket.write(TParser::sendIp(fid, sources.at(p).ip, sources.at(p).port).toAscii());
 				}
 			}
 			else

@@ -1,3 +1,6 @@
+#ifndef TPARSER_H
+#define TPARSER_H
+
 #include <QtCore>
 
 class TParser
@@ -31,3 +34,5 @@ public:
 	static QString getFile(QString fid, quint64 byte);
 	static bool splitGetFile(QString command, QString &fid, QString &byte);
 };
+
+#endif //TPARSER_H

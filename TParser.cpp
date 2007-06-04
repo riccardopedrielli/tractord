@@ -107,10 +107,10 @@ bool TParser::splitFind(QString command, QString &name, QString &sid)
 }
 
 /* Compose the FILE command for sending it to the client. */
-QString TParser::sendFile(QString fid, QString name, QString dim, QString sources, QString completes, QString sid)
+QString TParser::sendFile(QString sid, QString name, QString dim, QString sources, QString completes, QString fid)
 {
 	name.replace(QString("\""), QString("/\"/")); //Reaplace " with /"/
- 	return "FILE \"" + fid + "\" \"" + name + "\" \"" + dim + "\" \"" + sources + "\" \"" + completes + "\" \"" + sid + "\";";
+ 	return "FILE \"" + sid + "\" \"" + name + "\" \"" + dim + "\" \"" + sources + "\" \"" + completes + "\" \"" + fid + "\";";
 }
 
 /* Split the arguments of the GETIP command received from the client. */
@@ -182,14 +182,14 @@ QString TParser::find(QString name, quint64 sid)
 }
 
 /* Split the arguments of the FILE command received from the server. */
-bool TParser::splitSendFile(QString command, QString &fid, QString &name, QString &dim, QString &sources, QString &completes, QString &sid)
+bool TParser::splitSendFile(QString command, QString &sid, QString &name, QString &dim, QString &sources, QString &completes, QString &fid)
 {
 	QStringList list;
 	list=command.split(" \"");
 	if(list.count()!=7)
 		return false;
-	fid=list[1];
-	fid.chop(1);
+	sid=list[1];
+	sid.chop(1);
 	name=list[2];
 	name.replace("/\"/","\""); //Reaplace /"/ with "
 	name.chop(1);
@@ -199,8 +199,8 @@ bool TParser::splitSendFile(QString command, QString &fid, QString &name, QStrin
 	sources.chop(1);
 	completes=list[5];	
 	completes.chop(1);
-	sid=list[6];
-	sid.chop(1);
+	fid=list[6];
+	fid.chop(1);
 	return true;
 }
 

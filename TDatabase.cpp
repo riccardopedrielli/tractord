@@ -121,31 +121,35 @@ void TDatabase::setPort(QString uid, QString port)
 	QSqlQuery setPort("UPDATE users SET port='" + port + "' WHERE uid='" + uid + "'");
 }
 
-QStringList TDatabase::searchFile(QString name)
+QList<FileInfo> TDatabase::searchFile(QString name)
 {
 	/* Get the informations of files that correspond the searched string. */
 	QSqlQuery getList("SELECT names.fid AS fileid, names.name, files.dim, (SELECT count(*) FROM sources WHERE fid=fileid) AS sources, (SELECT count(*) FROM sources WHERE fid=fileid AND complete=1) AS completes FROM names, files WHERE names.name LIKE '" + name + "' AND names.fid = files.fid");
-	QStringList list;
+	QList<FileInfo> list;
+	FileInfo info;
 	while(getList.next())
 	{
-		list.append(getList.value(1).toString()); //Name
-		list.append(getList.value(2).toString()); //Dim
-		list.append(getList.value(3).toString()); //Sources
-		list.append(getList.value(4).toString()); //Completes
-		list.append(getList.value(0).toString()); //Fid
+		info.name=getList.value(1).toString();
+		info.dim=getList.value(2).toString();
+		info.sources=getList.value(3).toString();
+		info.completes=getList.value(4).toString();
+		info.fid=getList.value(0).toString();
+		list.append(info);
 	}
 	return list;
 }
 
-QStringList TDatabase::getSources(QString uid, QString fid)
+QList<FileSource> TDatabase::getSources(QString uid, QString fid)
 {
 	/* Get the file sources list. */
 	QSqlQuery getList("SELECT users.ip, users.port FROM users, sources WHERE sources.fid='" + fid + "' AND sources.uid=users.uid AND sources.uid<>'" + uid + "'");
-	QStringList list; //TODO: fill the list with query result.
+	QList<FileSource> list;
+	FileSource source;
 	while(getList.next())
 	{
-		list.append(getList.value(0).toString()); //Ip
-		list.append(getList.value(1).toString()); //Port
+		source.ip=getList.value(0).toString();
+		source.port=getList.value(1).toString();
+		list.append(source);
 	}
 	return list;
 }

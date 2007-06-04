@@ -3,6 +3,7 @@
 
 #include <QtSql>
 #include <QtNetwork>
+#include "info_structs.h"
 
 class TDatabase : public QObject
 {
@@ -19,8 +20,8 @@ public:
 	void deleteFile(QString uid, QString fid);
 	void completeFile(QString uid, QString fid);
 	void setPort(QString uid, QString port);
-	QStringList searchFile(QString name);
-	QStringList getSources(QString uid, QString fid); 
+	QList<FileInfo> searchFile(QString name);
+	QList<FileSource> getSources(QString uid, QString fid); 
 };
 
 #endif //TDATABASE_H
