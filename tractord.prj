@@ -1,3 +1,9 @@
+[Debug Settings]
+Program Arguments=
+Selected Debugger=0
+Source Paths=
+Symbol Paths=
+Working Directory=
 [Files]
 0=TClientSocket.h
 1=TServer.h
@@ -12,12 +18,6 @@
 10=md5.cpp
 11=md5.h
 12=info_structs.h
-[Debug Settings]
-Program Arguments=
-Selected Debugger=0
-Source Paths=
-Symbol Paths=
-Working Directory=
 [Open Files]
 Active File Display Mode=3
 Active File Index=5
@@ -27,9 +27,9 @@ Open File Line10=0
 Open File Line2=0
 Open File Line3=0
 Open File Line4=0
-Open File Line5=162
+Open File Line5=50
 Open File Line6=111
-Open File Line7=0
+Open File Line7=1300
 Open File Line8=0
 Open File Line9=2507
 Open File Pos0=441
@@ -74,13 +74,13 @@ Compilable=1
 Create Tagfile=0
 Filter=
 Include Sub Directories=1
-Project Start=D707060001000400130003001700000016
+Project Start=D70706000300060012000D000500000011
 Project Tagfile=
 Project Wordfile=
 Relative to Project File=1
 Save Account=0
 Use Relative Directory=1
 Using VCS=0
-Working Time=249446
+Working Time=249837
 [Project ID]
 Signature=UE Proj: v.1
