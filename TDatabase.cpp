@@ -5,15 +5,19 @@ TDatabase::TDatabase()
 {
 	/* Check the settings.
 	   If don't exist they are added.  */
-	QSettings settings(QSettings::IniFormat, QSettings::SystemScope, "MyProSoft/TractorServer", "config");
+	QSettings settings(QSettings::IniFormat, QSettings::SystemScope, "tractord", "settings");
+	if(!settings.contains("server/name"))
+		settings.setValue("server/name", "A Tractor Server");
+	if(!settings.contains("server/description"))
+		settings.setValue("server/description", "This server rocks!");
 	if(!settings.contains("database/driver"))
 		settings.setValue("database/driver", "QMYSQL");
 	if(!settings.contains("database/host"))
-		settings.setValue("database/host", "lollerlandia.no-ip.org");
+		settings.setValue("database/host", "localhost");
 	if(!settings.contains("database/port"))
 		settings.setValue("database/port", 3306);
 	if(!settings.contains("database/user"))
-		settings.setValue("database/user", "my_tractor");
+		settings.setValue("database/user", "user");
 	if(!settings.contains("database/password"))
 		settings.setValue("database/password", "password");
 	if(!settings.contains("database/dbname"))
@@ -34,7 +38,7 @@ TDatabase::TDatabase()
 		QCoreApplication::instance()->exit(1);
 	}
 	
-	/* Wipe the database in case it was previously crashed. */
+	/* Wipe the database in case the server was previously crashed. */
 	QSqlQuery query;
 	query.exec("DELETE FROM files");
 	query.exec("DELETE FROM names");
